@@ -1,0 +1,46 @@
+<!DCOTYPE html>
+
+<html>
+	<head><script src="https://d3js.org/d3.v3.min.js"></script>
+	<h1>yes</h1>
+	<style>
+		body {
+            	display: flex;
+            	justify-content: center;
+            	align-items: center;
+            	height: 100vh;
+            	margin: 0;
+        	}
+	</style>
+	</head>
+	<body>
+	<svg width="400" height="250">
+    		<!-- X-axis -->
+    		<line x1="50" y1="250" x2="400" y2="250" stroke="black" stroke-width="2" />
+
+    		<!-- Y-axis -->
+    		<line x1="50" y1="20" x2="50" y2="400" stroke="black" stroke-width="2" />
+
+		<!-- Bar 1 -->
+	 	<rect x="103" y="130" width="50" height="120" fill="blue" />
+
+		<!-- Bar 2 -->
+		<rect x="206" y="160" width="50" height="90" fill="green" />
+
+		<!-- Bar 3 -->
+		<rect x="309" y="190" width="50" height="60" fill="red" />
+	</svg>
+	<script>
+	d3.csv("C:\Users\reame\Downloads\Copy of shopping_behavior_updated.csv", function(data)
+	{
+		for(var i = 0; i < data.length; i++)
+		{
+			console.log(data[i]);
+			
+		}
+		system.out.println(data)
+	});
+	
+	</script>
+
+</html>
