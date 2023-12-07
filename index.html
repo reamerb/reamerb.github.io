@@ -31,9 +31,9 @@
 	<script>
 	function sumRowsByGender(dataset) {
 		return dataset.reduce((accumulator, current) => {
-		const { "Gender", "Purchase Amount (USD)" } = current;
+		const { Gender, score } = current;
 
-		accumulator[Gender] = (accumulator[Gender] || 0) + "Purchase Amount (USD)";
+		accumulator[Gender] = (accumulator[Gender] || 0) + score;
 
 		return accumulator;
  	}, {});
@@ -42,7 +42,7 @@
 	{
 		for(var i = 0; i < data.length; i++)
 		{
-			console.log(data[i]["Purchase Amount (USD)","Gender"]);
+			console.log(data[i]);
 			
 		}
 		const result = sumRowsByGender(data)
