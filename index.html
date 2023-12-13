@@ -200,7 +200,7 @@
           .transition()
           .call(yAxis);
 
-        // Select all existing bars and remove them before appending new ones
+        // Remove existing bars
         svg.selectAll('rect').remove();
 
         // Create bars
@@ -212,7 +212,7 @@
           .attr('y', d => yScale(data[d]))
           .attr('width', xScale.rangeBand() / 2)
           .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2') // Change color of the bars
+          .attr('fill', d => d === 'Female' ? '#FFA3D2' : '#0583D2') // Change color of the bars
           .on('mouseover', function (d) {
             // Show tooltip on mouseover
             const tooltip = d3.select('#tooltip');
@@ -249,7 +249,7 @@
         if (isChart1) {
           updateChart(computeAverageByGender(dataset));
         } else {
-          updateChart(computeAverageByGenderAndCategory(dataset));
+          updateChart(getTopCategoriesByGender(dataset));
         }
       };
 
