@@ -146,29 +146,16 @@
         .attr('class', 'y axis')
         .call(yAxis);
 
-      // Create bars for chart1
-      const bars1 = svg.selectAll('.bar1')
+      // Create bars
+      const bars = svg.selectAll('rect')
         .data(Object.keys(initialResult))
         .enter()
         .append('rect')
-        .attr('class', 'bar1')
         .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
         .attr('y', d => yScale(initialResult[d]))
         .attr('width', xScale.rangeBand() / 2)
         .attr('height', d => chartHeight - yScale(initialResult[d]))
-        .attr('fill', (d) => d === 'Male' ? '#0583D2' : '#FFA3D2'); // Change color of the bars
-
-      // Create bars for chart2 (initialize with hidden bars)
-      const bars2 = svg.selectAll('.bar2')
-        .data(Object.keys(initialResult))
-        .enter()
-        .append('rect')
-        .attr('class', 'bar2')
-        .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', chartHeight) // Initially set y to chartHeight to hide the bars
-        .attr('width', xScale.rangeBand() / 2)
-        .attr('height', 0)
-        .attr('fill', '#FFA3D2'); // Set color for chart2 bars
+        .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
 
       // Function to update the chart based on the selected data
       function updateChart(data) {
@@ -190,51 +177,26 @@
           .transition()
           .call(yAxis);
 
-        // Update bars for chart1
-        bars1.data(Object.keys(data))
+        // Update bars
+        bars.data(Object.keys(data))
           .transition()
           .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
           .attr('y', d => yScale(data[d]))
           .attr('width', xScale.rangeBand() / 2)
           .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', (d) => d === 'Male' ? '#0583D2' : '#FFA3D2'); // Change color of the bars
-
-        // Update bars for chart2
-        bars2.data(Object.keys(data))
-          .transition()
-          .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-          .attr('y', d => yScale(data[d]))
-          .attr('width', xScale.rangeBand() / 2)
-          .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', '#FFA3D2'); // Set color for chart2 bars
+          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
       }
 
       // Toggle between charts
       let isChart1 = true;
 
-      window.toggleChart = function () {
+      window.toggleChart = function() {
         isChart1 = !isChart1;
 
         if (isChart1) {
-          // Hide bars for chart2
-          bars2.transition()
-            .attr('y', chartHeight)
-            .attr('height', 0);
-
-          // Show bars for chart1
-          bars1.transition()
-            .attr('y', d => yScale(initialResult[d]))
-            .attr('height', d => chartHeight - yScale(initialResult[d]));
+          updateChart(computeAverageByGender(dataset));
         } else {
-          // Hide bars for chart1
-          bars1.transition()
-            .attr('y', chartHeight)
-            .attr('height', 0);
-
-          // Show bars for chart2
-          bars2.transition()
-            .attr('y', d => yScale(initialResult[d]))
-            .attr('height', d => chartHeight - yScale(initialResult[d]));
+          updateChart(computeAverageByGenderAndCategory(dataset));
         }
       };
 
