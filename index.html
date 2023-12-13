@@ -134,14 +134,14 @@
         .attr('width', xScale.rangeBand() / 2)
         .attr('height', d => chartHeight - yScale(computeAverageByGender(dataset)[d]))
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2') // Change color of the bars
-        .on('mouseover', function (event, d) {
+        .on('mouseover', function (d) {
           // Show tooltip on mouseover
           const tooltip = d3.select('#tooltip');
           const average = computeAverageByGender(dataset)[d];
           if (average !== undefined) {
             tooltip.html(`<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}`);
-            tooltip.style('left', (event.pageX + 10) + 'px')
-              .style('top', (event.pageY - 10) + 'px')
+            tooltip.style('left', (d3.event.pageX + 10) + 'px')
+              .style('top', (d3.event.pageY - 10) + 'px')
               .style('display', 'block');
           }
         })
