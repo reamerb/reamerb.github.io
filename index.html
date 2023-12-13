@@ -65,16 +65,42 @@
         return averages;
       }
 
+      // Function to compute average purchase amount grouped by gender and category
+      function computeAverageByGenderAndCategory(data) {
+        const sums = {};
+        const counts = {};
+
+        // Iterate through the data to calculate sums and counts
+        data.forEach(function (d) {
+          const gender = d.Gender;
+          const category = d.Category;
+          const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
+
+          const key = gender + '-' + category;
+
+          sums[key] = (sums[key] || 0) + purchaseAmount;
+          counts[key] = (counts[key] || 0) + 1;
+        });
+
+        // Calculate averages
+        const averages = {};
+        for (const key in sums) {
+          averages[key] = sums[key] / counts[key];
+        }
+
+        return averages;
+      }
+
       // Call the function and get the result
       const initialResult = computeAverageByGender(dataset);
 
       // Set up the chart dimensions
       const svgWidth = 600; // Increased width by 50%
-      const svgHeight = 600; // Maintained the same height
+      const svgHeight = 700; // Increased height by 100
       const margin = {
         top: 20,
         right: 20,
-        bottom: 40,
+        bottom: 50,
         left: 50
       };
       const chartWidth = svgWidth - margin.left - margin.right;
@@ -93,7 +119,7 @@
         .rangeBands([0, chartWidth], 0.25);
 
       const yScale = d3.scale.linear()
-        .domain([0, d3.max(Object.values(initialResult))]) // Adjusted Y-axis domain
+        .domain([0, d3.max(Object.values(initialResult)) + 10]) // Adjusted Y-axis domain
         .range([chartHeight, 0]);
 
       // Create X and Y axes
@@ -149,7 +175,7 @@
         const result = toggle ? computeAverageByGenderAndCategory(dataset) : initialResult;
 
         // Update the Y-axis scale
-        yScale.domain([0, d3.max(Object.values(result))]);
+        yScale.domain([0, d3.max(Object.values(result)) + 10]);
 
         // Update the bars with new data
         svg.selectAll('rect')
