@@ -44,10 +44,16 @@
 
   <div class="tooltip" id="tooltip"></div>
 
+  <div id="button-container">
+    <button onclick="toggleChart()">Toggle Chart</button>
+  </div>
+
   <script>
     // Load the CSV data
     d3.csv('shopping_behavior_updated.csv', function (error, dataset) {
       if (error) throw error;
+
+      let isChart1 = true;
 
       // Function to compute average purchase amount grouped by gender
       function computeAverageByGender(data) {
@@ -188,8 +194,8 @@
           // Show tooltip on mouseover
           const tooltip = d3.select('#tooltip');
           const average = computeAverageByGender(dataset)[d];
-          const topCategories = getTopCategoriesByGender(dataset)[d];
           const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
+          const topCategories = getTopCategoriesByGender(dataset)[d];
 
           // Generate tooltip content
           let tooltipContent = `Gender: ${d}<br>Average Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
@@ -211,6 +217,50 @@
           const tooltip = d3.select('#tooltip');
           tooltip.style('display', 'none');
         });
+
+      // Function to update the chart based on the selected data
+      function updateChart(data) {
+        // Update scales
+        xScale.domain(Object.keys(data));
+        yScale.domain([0, d3.max(Object.values(data)) + 10]);
+
+        // Update axes
+        svg.select('.x.axis')
+          .transition()
+          .call(xAxis)
+          .selectAll('text') // Select all the text elements for rotation
+          .style('text-anchor', 'end') // Set text anchor to the end (right)
+          .attr('dx', '-.8em') // Adjust the position
+          .attr('dy', '.15em') // Adjust the position
+          .attr('transform', 'rotate(-45)'); // Rotate the text by -45 degrees
+
+        svg.select('.y.axis')
+          .transition()
+          .call(yAxis);
+
+        // Update bars
+        bars.data(Object.keys(data))
+          .transition()
+          .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
+          .attr('y', d => yScale(data[d]))
+          .attr('width', xScale.rangeBand() / 2)
+          .attr('height', d => chartHeight - yScale(data[d]))
+          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
+      }
+
+      // Toggle between charts
+      window.toggleChart = function () {
+        isChart1 = !isChart1;
+
+        if (isChart1) {
+          updateChart(computeAverageByGender(dataset));
+        } else {
+          updateChart(computeAverageByGenderAndCategory(dataset));
+        }
+      };
+
+      // Initial chart
+      updateChart(computeAverageByGender(dataset));
     });
   </script>
 
