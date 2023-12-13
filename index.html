@@ -72,6 +72,30 @@
         return averages;
       }
 
+      // Function to get the top 4 categories for each gender
+      function getTopCategoriesByGender(data) {
+        const categoriesByGender = {};
+
+        data.forEach(function (d) {
+          const gender = d.Gender;
+          const category = d.Category;
+
+          if (!categoriesByGender[gender]) {
+            categoriesByGender[gender] = {};
+          }
+
+          categoriesByGender[gender][category] = (categoriesByGender[gender][category] || 0) + 1;
+        });
+
+        // Sort categories by frequency in descending order
+        for (const gender in categoriesByGender) {
+          const sortedCategories = Object.keys(categoriesByGender[gender]).sort((a, b) => categoriesByGender[gender][b] - categoriesByGender[gender][a]);
+          categoriesByGender[gender] = sortedCategories.slice(0, 4);
+        }
+
+        return categoriesByGender;
+      }
+
       // Set up the chart dimensions
       const svgWidth = 600; // Increased width by 50%
       const svgHeight = 700; // Increased height by 100
@@ -138,8 +162,9 @@
           // Show tooltip on mouseover
           const tooltip = d3.select('#tooltip');
           const average = computeAverageByGender(dataset)[d];
+          const topCategories = getTopCategoriesByGender(dataset)[d];
           if (average !== undefined) {
-            tooltip.html(`<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}`);
+            tooltip.html(`<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}`);
             tooltip.style('left', (d3.event.pageX + 10) + 'px')
               .style('top', (d3.event.pageY - 10) + 'px')
               .style('display', 'block');
