@@ -72,7 +72,7 @@
         return averages;
       }
 
-      // Function to get the top 4 categories for each gender
+      // Function to get the top categories for each gender
       function getTopCategoriesByGender(data) {
         const categoriesByGender = {};
 
@@ -189,20 +189,19 @@
           const tooltip = d3.select('#tooltip');
           const average = computeAverageByGender(dataset)[d];
           const topCategories = getTopCategoriesByGender(dataset)[d];
-          const genderCategoryAverage = computeAverageByGenderAndCategory(dataset)[d];
+          const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
+          const tooltipContent = `<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
           
-          if (average !== undefined) {
-            tooltip.html(`<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`);
-            
-            // Add average purchase amount for each category
-            for (const category in genderCategoryAverage) {
-              tooltip.html(`${tooltip.html()}${category}: $${genderCategoryAverage[category].toFixed(2)}<br>`);
-            }
-
-            tooltip.style('left', (d3.event.pageX + 10) + 'px')
-              .style('top', (d3.event.pageY - 10) + 'px')
-              .style('display', 'block');
+          // Add average purchase amount for each category
+          for (const category in genderCategoryAverage) {
+            tooltipContent += `${category}: $${genderCategoryAverage[category][d].toFixed(2)}<br>`;
           }
+
+          tooltip.html(tooltipContent);
+          
+          tooltip.style('left', (d3.event.pageX + 10) + 'px')
+            .style('top', (d3.event.pageY - 10) + 'px')
+            .style('display', 'block');
         })
         .on('mouseout', function () {
           // Hide tooltip on mouseout
