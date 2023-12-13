@@ -42,64 +42,88 @@
     d3.csv('shopping_behavior_updated.csv', function (error, dataset) {
       if (error) throw error;
 
-      // Function to compute average purchase amount grouped by gender
-      function computeAverageByGender(data) {
-        const sums = {};
-        const counts = {};
+      // Set up the initial chart dimensions
+      const svgWidth = 600; // Increased width by 50%
+      const svgHeight = 700; // Increased height by 100
+      const margin = {
+        top: 20,
+        right: 20,
+        bottom: 50,
+        left: 50
+      };
+      const chartWidth = svgWidth - margin.left - margin.right;
+      const chartHeight = svgHeight - margin.top - margin.bottom;
 
-        // Iterate through the data to calculate sums and counts
-        data.forEach(function (d) {
-          const gender = d.Gender;
-          const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
+      // Create an SVG element
+      const svg = d3.select('.chart').append('svg')
+        .attr('width', svgWidth)
+        .attr('height', svgHeight)
+        .append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-          sums[gender] = (sums[gender] || 0) + purchaseAmount;
-          counts[gender] = (counts[gender] || 0) + 1;
-        });
+      // Toggle button function
+      document.getElementById('toggleButton').addEventListener('click', function () {
+        const isChart1 = svg.selectAll('rect').data().length > 0;
 
-        // Calculate averages
-        const averages = {};
-        for (const gender in sums) {
-          averages[gender] = sums[gender] / counts[gender];
-        }
-
-        return averages;
-      }
-
-      // Function to compute average purchase amount grouped by gender and category (top two categories)
-      function computeAverageByGenderAndCategory(data) {
-        const sums = {};
-        const counts = {};
-
-        // Filter data for the top two categories
-        const filteredData = data.filter(function (d) {
-          return d.Category === 'Category1' || d.Category === 'Category2';
-        });
-
-        // Iterate through the filtered data to calculate sums and counts
-        filteredData.forEach(function (d) {
-          const gender = d.Gender;
-          const category = d.Category;
-          const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
-
-          const key = gender + '-' + category;
-
-          sums[key] = (sums[key] || 0) + purchaseAmount;
-          counts[key] = (counts[key] || 0) + 1;
-        });
-
-        // Calculate averages
-        const averages = {};
-        for (const key in sums) {
-          averages[key] = sums[key] / counts[key];
-        }
-
-        return averages;
-      }
-
-      // Function to update the chart based on the selected type
-      function updateChart(data) {
         // Remove existing chart elements
         svg.selectAll('*').remove();
+
+        // Function to compute average purchase amount grouped by gender
+        function computeAverageByGender(data) {
+          const sums = {};
+          const counts = {};
+
+          // Iterate through the data to calculate sums and counts
+          data.forEach(function (d) {
+            const gender = d.Gender;
+            const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
+
+            sums[gender] = (sums[gender] || 0) + purchaseAmount;
+            counts[gender] = (counts[gender] || 0) + 1;
+          });
+
+          // Calculate averages
+          const averages = {};
+          for (const gender in sums) {
+            averages[gender] = sums[gender] / counts[gender];
+          }
+
+          return averages;
+        }
+
+        // Function to compute average purchase amount grouped by gender and category (top two categories)
+        function computeAverageByGenderAndCategory(data) {
+          const sums = {};
+          const counts = {};
+
+          // Filter data for the top two categories
+          const filteredData = data.filter(function (d) {
+            return d.Category === 'Category1' || d.Category === 'Category2';
+          });
+
+          // Iterate through the filtered data to calculate sums and counts
+          filteredData.forEach(function (d) {
+            const gender = d.Gender;
+            const category = d.Category;
+            const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
+
+            const key = gender + '-' + category;
+
+            sums[key] = (sums[key] || 0) + purchaseAmount;
+            counts[key] = (counts[key] || 0) + 1;
+          });
+
+          // Calculate averages
+          const averages = {};
+          for (const key in sums) {
+            averages[key] = sums[key] / counts[key];
+          }
+
+          return averages;
+        }
+
+        // Call the function and get the result
+        const data = isChart1 ? computeAverageByGenderAndCategory(dataset) : computeAverageByGender(dataset);
 
         // Create X and Y scales
         const xScale = d3.scale.ordinal()
@@ -152,93 +176,8 @@
           .attr('width', xScale.rangeBand() / 2)
           .attr('height', d => chartHeight - yScale(data[d]))
           .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
-      }
-
-      // Call the function and get the result
-      const initialResult = computeAverageByGender(dataset);
-
-      // Set up the chart dimensions
-      const svgWidth = 600; // Increased width by 50%
-      const svgHeight = 700; // Increased height by 100
-      const margin = {
-        top: 20,
-        right: 20,
-        bottom: 50,
-        left: 50
-      };
-      const chartWidth = svgWidth - margin.left - margin.right;
-      const chartHeight = svgHeight - margin.top - margin.bottom;
-
-      // Create an SVG element
-      const svg = d3.select('.chart').append('svg')
-        .attr('width', svgWidth)
-        .attr('height', svgHeight)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-      // Create X and Y scales
-      const xScale = d3.scale.ordinal()
-        .domain(Object.keys(initialResult))
-        .rangeBands([0, chartWidth], 0.25);
-
-      const yScale = d3.scale.linear()
-        .domain([0, d3.max(Object.values(initialResult)) + 10]) // Adjusted Y-axis domain
-        .range([chartHeight, 0]);
-
-      // Create X and Y axes
-      const xAxis = d3.svg.axis()
-        .scale(xScale)
-        .orient('bottom');
-
-      const yAxis = d3.svg.axis()
-        .scale(yScale)
-        .orient('left');
-
-      // Draw X and Y axes
-      svg.append('g')
-        .attr('class', 'x axis')
-        .attr('transform', 'translate(0,' + chartHeight + ')')
-        .call(xAxis)
-        .append('text') // Label for X-axis
-        .attr('x', chartWidth / 2)
-        .attr('y', margin.bottom - 5)
-        .attr('dy', '1em')
-        .style('text-anchor', 'middle')
-        .text('Gender');
-
-      svg.append('g')
-        .attr('class', 'y axis')
-        .call(yAxis)
-        .append('text') // Label for Y-axis
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 0 - margin.left - 5)
-        .attr('x', 0 - chartHeight / 2)
-        .attr('dy', '1em')
-        .style('text-anchor', 'middle')
-        .text('Purchase Amount (USD)');
-
-      // Create bars
-      svg.selectAll('rect')
-        .data(Object.keys(initialResult))
-        .enter()
-        .append('rect')
-        .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', d => yScale(initialResult[d]))
-        .attr('width', xScale.rangeBand() / 2)
-        .attr('height', d => chartHeight - yScale(initialResult[d]))
-        .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
-
-      // Toggle button function
-      document.getElementById('toggleButton').addEventListener('click', function () {
-        const isChart1 = svg.selectAll('rect').data().length > 0;
-
-        // Update chart based on the selected type
-        if (isChart1) {
-          updateChart(computeAverageByGenderAndCategory(dataset));
-        } else {
-          updateChart(computeAverageByGender(dataset));
-        }
       });
+
     });
   </script>
 
