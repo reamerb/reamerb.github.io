@@ -121,7 +121,7 @@
       // Create X and Y scales
       const xScale = d3.scale.ordinal()
         .domain(Object.keys(initialResult))
-        .rangeBands([0, chartWidth], 0.25);
+        .rangeBands([0, chartWidth], 0.2); // Adjusted range for better spacing
 
       const yScale = d3.scale.linear()
         .domain([0, d3.max(Object.values(initialResult)) + 10]) // Adjusted Y-axis domain
@@ -141,12 +141,11 @@
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,' + chartHeight + ')')
         .call(xAxis)
-        .append('text') // Label for X-axis
-        .attr('x', chartWidth / 2)
-        .attr('y', margin.bottom - 5)
-        .attr('dy', '1em')
-        .style('text-anchor', 'middle')
-        .text('Gender');
+        .selectAll('text') // Rotate X-axis labels for better readability
+        .attr('transform', 'rotate(-45)')
+        .attr('dx', '-.8em')
+        .attr('dy', '.15em')
+        .style('text-anchor', 'end');
 
       svg.append('g')
         .attr('class', 'y axis')
@@ -184,13 +183,18 @@
             .domain(Object.keys(data))
             .rangeBands([0, chartWidth], 0.25);
 
+          // Adjusted range for better spacing in the second chart
+          const adjustedXScale = d3.scale.ordinal()
+            .domain(Object.keys(data))
+            .rangeBands([0, chartWidth], 0.2);
+
           const yScale = d3.scale.linear()
             .domain([0, d3.max(Object.values(data)) + 10]) // Adjusted Y-axis domain
             .range([chartHeight, 0]);
 
           // Create X and Y axes
           const xAxis = d3.svg.axis()
-            .scale(xScale)
+            .scale(isChart1 ? xScale : adjustedXScale) // Use adjusted X-scale for the second chart
             .orient('bottom');
 
           const yAxis = d3.svg.axis()
@@ -202,12 +206,11 @@
             .attr('class', 'x axis')
             .attr('transform', 'translate(0,' + chartHeight + ')')
             .call(xAxis)
-            .append('text') // Label for X-axis
-            .attr('x', chartWidth / 2)
-            .attr('y', margin.bottom - 5)
-            .attr('dy', '1em')
-            .style('text-anchor', 'middle')
-            .text('Gender');
+            .selectAll('text') // Rotate X-axis labels for better readability
+            .attr('transform', 'rotate(-45)')
+            .attr('dx', '-.8em')
+            .attr('dy', '.15em')
+            .style('text-anchor', 'end');
 
           svg.append('g')
             .attr('class', 'y axis')
@@ -225,9 +228,9 @@
             .data(Object.keys(data))
             .enter()
             .append('rect')
-            .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
+            .attr('x', d => isChart1 ? xScale(d) + xScale.rangeBand() / 4 : adjustedXScale(d) + adjustedXScale.rangeBand() / 4)
             .attr('y', d => yScale(data[d]))
-            .attr('width', xScale.rangeBand() / 2)
+            .attr('width', isChart1 ? xScale.rangeBand() / 2 : adjustedXScale.rangeBand() / 2)
             .attr('height', d => chartHeight - yScale(data[d]))
             .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
         };
