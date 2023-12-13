@@ -12,16 +12,28 @@
       overflow: hidden;
     }
 
-    svg {
+    .chart-container {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
     }
+
+    .chart {
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 
 <body>
+
+  <div class="chart-container">
+    <!-- First Chart -->
+    <div class="chart" id="chart1"></div>
+
+    <!-- Second Chart -->
+    <div class="chart" id="chart2"></div>
+  </div>
 
   <script>
     // Load the CSV data
@@ -87,7 +99,7 @@
 
       // Set up the chart dimensions
       const svgWidth = 600; // Increased width by 50%
-      const svgHeight = 1200; // Doubled the height for two charts
+      const chartHeight = 400; // Set a fixed chart height
       const margin = {
         top: 20,
         right: 20,
@@ -95,11 +107,10 @@
         left: 50
       };
       const chartWidth = svgWidth - margin.left - margin.right;
-      const chartHeight = (svgHeight - margin.top - margin.bottom) / 2; // Divided height for two charts
       const barPadding = 0.2;
 
       // Create the first SVG element
-      const svg1 = d3.select('body').append('svg')
+      const svg1 = d3.select('#chart1').append('svg')
         .attr('width', svgWidth)
         .attr('height', chartHeight)
         .append('g')
@@ -158,7 +169,7 @@
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars for the first chart
 
       // Create the second SVG element
-      const svg2 = d3.select('body').append('svg')
+      const svg2 = d3.select('#chart2').append('svg')
         .attr('width', svgWidth)
         .attr('height', chartHeight)
         .append('g')
