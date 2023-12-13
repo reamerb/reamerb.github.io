@@ -32,6 +32,7 @@
       function computeAverageByGender(data) {
         const sums = {};
         const counts = {};
+        const averages = {};
 
         // Iterate through the data to calculate sums and counts
         data.forEach(function (d) {
@@ -40,12 +41,23 @@
 
           sums[gender] = (sums[gender] || 0) + purchaseAmount;
           counts[gender] = (counts[gender] || 0) + 1;
+
+          // Calculate averages per category
+          if (!averages[gender]) {
+            averages[gender] = {};
+          }
+
+          const categories = Object.keys(d).filter(key => key !== 'Gender' && key !== 'Purchase Amount (USD)');
+          categories.forEach(category => {
+            averages[gender][category] = (averages[gender][category] || 0) + parseFloat(d[category]);
+          });
         });
 
-        // Calculate averages
-        const averages = {};
-        for (const gender in sums) {
-          averages[gender] = sums[gender] / counts[gender];
+        // Calculate final averages per category
+        for (const gender in averages) {
+          for (const category in averages[gender]) {
+            averages[gender][category] /= counts[gender];
+          }
         }
 
         return averages;
@@ -122,13 +134,13 @@
         .enter()
         .append('rect')
         .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', d => yScale(result[d]))
+        .attr('y', d => yScale(result[d]['Purchase Amount (USD)']))
         .attr('width', xScale.rangeBand() / 2)
-        .attr('height', d => chartHeight - yScale(result[d]))
+        .attr('height', d => chartHeight - yScale(result[d]['Purchase Amount (USD)']))
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
 
       // Label the bars
-      svg.selectAll('text')
+      svg.selectAll('.bar-label')
         .data(Object.keys(result))
         .enter()
         .append('text')
@@ -136,7 +148,8 @@
         .attr('x', d => xScale(d) + xScale.rangeBand() / 2)
         .attr('y', chartHeight + margin.bottom - 5)
         .attr('text-anchor', 'middle')
-        .attr('font-size', '12px');
+        .attr('font-size', '12px')
+        .attr('class', 'bar-label');
     });
   </script>
 
