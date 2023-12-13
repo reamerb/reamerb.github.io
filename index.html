@@ -156,7 +156,7 @@
         .attr('y', d => yScale(initialResult[d]))
         .attr('width', xScale.rangeBand() / 2)
         .attr('height', d => chartHeight - yScale(initialResult[d]))
-        .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
+        .attr('fill', (d, i) => i === 'Male' ? '#0583D2' : '#FFA3D2'); // Change color of the bars
 
       // Create bars for chart2 (initialize with hidden bars)
       const bars2 = svg.selectAll('.bar2')
@@ -197,7 +197,7 @@
           .attr('y', d => yScale(data[d]))
           .attr('width', xScale.rangeBand() / 2)
           .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
+          .attr('fill', (d, i) => i === 'Male' ? '#0583D2' : '#FFA3D2'); // Change color of the bars
 
         // Update bars for chart2
         bars2.data(Object.keys(data))
