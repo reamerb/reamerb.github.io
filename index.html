@@ -13,9 +13,9 @@
     }
 
     .chart-container {
-      position: relative; /* Updated position to relative */
-      margin: 0 auto; /* Center the container */
-      width: 600px; /* Set a fixed width for the container */
+      position: absolute;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
     }
 
@@ -32,11 +32,6 @@
       border-radius: 5px;
       pointer-events: none;
     }
-
-    #button-container {
-      text-align: center; /* Center the button container */
-      margin-top: 20px; /* Adjusted margin for spacing */
-    }
   </style>
 </head>
 
@@ -49,7 +44,7 @@
 
   <div class="tooltip" id="tooltip"></div>
 
-  <div id="button-container">
+  <div id="button-container" position: absolute; left: 100px;>
     <button onclick="toggleChart()">Toggle Chart</button>
   </div>
 
