@@ -61,112 +61,101 @@
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-      // Toggle button function
-      document.getElementById('toggleButton').addEventListener('click', function () {
-        const isChart1 = svg.selectAll('rect').data().length > 0;
+      // Function to compute average purchase amount grouped by gender
+      function computeAverageByGender(data) {
+        const sums = {};
+        const counts = {};
 
-        // Remove existing chart elements
-        svg.selectAll('*').remove();
+        // Iterate through the data to calculate sums and counts
+        data.forEach(function (d) {
+          const gender = d.Gender;
+          const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
 
-        // Function to compute average purchase amount grouped by gender
-        function computeAverageByGender(data) {
-          const sums = {};
-          const counts = {};
+          sums[gender] = (sums[gender] || 0) + purchaseAmount;
+          counts[gender] = (counts[gender] || 0) + 1;
+        });
 
-          // Iterate through the data to calculate sums and counts
-          data.forEach(function (d) {
-            const gender = d.Gender;
-            const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
-
-            sums[gender] = (sums[gender] || 0) + purchaseAmount;
-            counts[gender] = (counts[gender] || 0) + 1;
-          });
-
-          // Calculate averages
-          const averages = {};
-          for (const gender in sums) {
-            averages[gender] = sums[gender] / counts[gender];
-          }
-
-          return averages;
+        // Calculate averages
+        const averages = {};
+        for (const gender in sums) {
+          averages[gender] = sums[gender] / counts[gender];
         }
 
-        // Function to compute average purchase amount grouped by gender and category (top two categories)
-        function computeAverageByGenderAndCategory(data) {
-          const sums = {};
-          const counts = {};
+        return averages;
+      }
 
-          // Filter data for the top two categories
-          const filteredData = data.filter(function (d) {
-            return d.Category === 'Category1' || d.Category === 'Category2';
-          });
+      // Function to compute average purchase amount grouped by gender and category (top two categories)
+      function computeAverageByGenderAndCategory(data) {
+        const sums = {};
+        const counts = {};
 
-          // Iterate through the filtered data to calculate sums and counts
-          filteredData.forEach(function (d) {
-            const gender = d.Gender;
-            const category = d.Category;
-            const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
+        // Filter data for the top two categories
+        const filteredData = data.filter(function (d) {
+          return d.Category === 'Category1' || d.Category === 'Category2';
+        });
 
-            const key = gender + '-' + category;
+        // Iterate through the filtered data to calculate sums and counts
+        filteredData.forEach(function (d) {
+          const gender = d.Gender;
+          const category = d.Category;
+          const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
 
-            sums[key] = (sums[key] || 0) + purchaseAmount;
-            counts[key] = (counts[key] || 0) + 1;
-          });
+          const key = gender + '-' + category;
 
-          // Calculate averages
-          const averages = {};
-          for (const key in sums) {
-            averages[key] = sums[key] / counts[key];
-          }
+          sums[key] = (sums[key] || 0) + purchaseAmount;
+          counts[key] = (counts[key] || 0) + 1;
+        });
 
-          return averages;
+        // Calculate averages
+        const averages = {};
+        for (const key in sums) {
+          averages[key] = sums[key] / counts[key];
         }
 
-        // Call the function and get the result
-        const data = isChart1 ? computeAverageByGenderAndCategory(dataset) : computeAverageByGender(dataset);
+        return averages;
+      }
 
-        // Create X and Y scales
-        const xScale = d3.scale.ordinal()
-          .domain(Object.keys(data))
-          .rangeBands([0, chartWidth], 0.25);
+      // Create X and Y scales
+      const xScale = d3.scale.ordinal()
+        .rangeBands([0, chartWidth], 0.25);
 
-        const yScale = d3.scale.linear()
-          .domain([0, d3.max(Object.values(data)) + 10]) // Adjusted Y-axis domain
-          .range([chartHeight, 0]);
+      const yScale = d3.scale.linear()
+        .range([chartHeight, 0]);
 
-        // Create X and Y axes
-        const xAxis = d3.svg.axis()
-          .scale(xScale)
-          .orient('bottom');
+      // Create X and Y axes
+      const xAxis = d3.svg.axis()
+        .scale(xScale)
+        .orient('bottom');
 
-        const yAxis = d3.svg.axis()
-          .scale(yScale)
-          .orient('left');
+      const yAxis = d3.svg.axis()
+        .scale(yScale)
+        .orient('left');
 
-        // Draw X and Y axes
-        svg.append('g')
-          .attr('class', 'x axis')
-          .attr('transform', 'translate(0,' + chartHeight + ')')
-          .call(xAxis)
-          .append('text') // Label for X-axis
-          .attr('x', chartWidth / 2)
-          .attr('y', margin.bottom - 5)
-          .attr('dy', '1em')
-          .style('text-anchor', 'middle')
-          .text('Gender');
+      // Draw X and Y axes
+      svg.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(0,' + chartHeight + ')')
+        .call(xAxis)
+        .append('text') // Label for X-axis
+        .attr('x', chartWidth / 2)
+        .attr('y', margin.bottom - 5)
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Gender');
 
-        svg.append('g')
-          .attr('class', 'y axis')
-          .call(yAxis)
-          .append('text') // Label for Y-axis
-          .attr('transform', 'rotate(-90)')
-          .attr('y', 0 - margin.left - 5)
-          .attr('x', 0 - chartHeight / 2)
-          .attr('dy', '1em')
-          .style('text-anchor', 'middle')
-          .text('Purchase Amount (USD)');
+      svg.append('g')
+        .attr('class', 'y axis')
+        .call(yAxis)
+        .append('text') // Label for Y-axis
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - margin.left - 5)
+        .attr('x', 0 - chartHeight / 2)
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Purchase Amount (USD)');
 
-        // Create bars
+      // Create bars
+      function createBars(data, color) {
         svg.selectAll('rect')
           .data(Object.keys(data))
           .enter()
@@ -175,9 +164,35 @@
           .attr('y', d => yScale(data[d]))
           .attr('width', xScale.rangeBand() / 2)
           .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
-      });
+          .attr('fill', color);
+      }
 
+      // Initial chart
+      const initialResult = computeAverageByGender(dataset);
+      xScale.domain(Object.keys(initialResult));
+      yScale.domain([0, d3.max(Object.values(initialResult)) + 10]);
+
+      createBars(initialResult, '#0583D2');
+
+      // Toggle button function
+      document.getElementById('toggleButton').addEventListener('click', function () {
+        const isChart1 = svg.selectAll('rect').data().length > 0;
+
+        // Remove existing chart elements
+        svg.selectAll('*').remove();
+
+        // Update chart based on the selected type
+        if (isChart1) {
+          const newData = computeAverageByGenderAndCategory(dataset);
+          xScale.domain(Object.keys(newData));
+          yScale.domain([0, d3.max(Object.values(newData)) + 10]);
+          createBars(newData, '#FFA3D2');
+        } else {
+          xScale.domain(Object.keys(initialResult));
+          yScale.domain([0, d3.max(Object.values(initialResult)) + 10]);
+          createBars(initialResult, '#0583D2');
+        }
+      });
     });
   </script>
 
