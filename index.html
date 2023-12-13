@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>D3 v3 Bar Chart Example</title>
   <script src="https://d3js.org/d3.v3.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
 </head>
 <body>
 
@@ -46,16 +59,12 @@ d3.csv('shopping_behavior_updated.csv', function(error, dataset) {
   const chartWidth = svgWidth - margin.left - margin.right;
   const chartHeight = svgHeight - margin.top - margin.bottom;
 
-  // Calculate the center of the page
-  const centerX = (window.innerWidth - svgWidth) / 2;
-  const centerY = (window.innerHeight - svgHeight) / 2;
-
   // Create an SVG element
   const svg = d3.select('body').append('svg')
     .attr('width', svgWidth)
     .attr('height', svgHeight)
     .append('g')
-    .attr('transform', 'translate(' + (centerX + margin.left) + ',' + (centerY + margin.top) + ')'); // Center the chart
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')'); // Maintain the same margin
 
   // Create X and Y scales
   const xScale = d3.scale.ordinal()
@@ -115,7 +124,6 @@ d3.csv('shopping_behavior_updated.csv', function(error, dataset) {
     .attr('y', chartHeight + margin.bottom - 5)
     .attr('text-anchor', 'middle')
     .attr('font-size', '12px');
-
 });
 </script>
 
