@@ -57,7 +57,12 @@
       // Set up the chart dimensions
       const svgWidth = 600; // Increased width by 50%
       const svgHeight = 600; // Maintained the same height
-      const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+      const margin = {
+        top: 20,
+        right: 20,
+        bottom: 40,
+        left: 50
+      };
       const chartWidth = svgWidth - margin.left - margin.right;
       const chartHeight = svgHeight - margin.top - margin.bottom;
 
@@ -90,7 +95,13 @@
       svg.append('g')
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,' + chartHeight + ')')
-        .call(xAxis);
+        .call(xAxis)
+        .append('text') // Label for X-axis
+        .attr('x', chartWidth / 2)
+        .attr('y', margin.bottom - 5)
+        .attr('dy', '1em')
+        .style('text-anchor', 'middle')
+        .text('Gender');
 
       svg.append('g')
         .attr('class', 'y axis')
@@ -117,7 +128,7 @@
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the second bar
 
       // Label the bars
-      svg.selectAll('.bar-label')
+      svg.selectAll('text')
         .data(Object.keys(result))
         .enter()
         .append('text')
@@ -125,8 +136,7 @@
         .attr('x', d => xScale(d) + xScale.rangeBand() / 2)
         .attr('y', chartHeight + margin.bottom - 5)
         .attr('text-anchor', 'middle')
-        .attr('font-size', '12px')
-        .attr('class', 'bar-label');
+        .attr('font-size', '12px');
     });
   </script>
 
