@@ -65,7 +65,7 @@
         return averages;
       }
 
-      // Function to compute average purchase amount grouped by gender and category
+      // Function to compute average purchase amount grouped by gender and category (top two categories)
       function computeAverageByGenderAndCategory(data) {
         const sums = {};
         const counts = {};
@@ -82,10 +82,22 @@
           counts[key] = (counts[key] || 0) + 1;
         });
 
+        // Filter to include only the top two categories for each gender
+        const filteredSums = {};
+        const filteredCounts = {};
+
+        for (const key in sums) {
+          const [gender] = key.split('-');
+          if (!filteredSums[gender] || sums[key] > filteredSums[gender]) {
+            filteredSums[gender] = sums[key];
+            filteredCounts[gender] = counts[key];
+          }
+        }
+
         // Calculate averages
         const averages = {};
-        for (const key in sums) {
-          averages[key] = sums[key] / counts[key];
+        for (const key in filteredSums) {
+          averages[key] = filteredSums[key] / filteredCounts[key];
         }
 
         return averages;
@@ -155,7 +167,7 @@
         .text('Purchase Amount (USD)');
 
       // Create bars
-      svg.selectAll('rect')
+      const bars = svg.selectAll('rect')
         .data(Object.keys(initialResult))
         .enter()
         .append('rect')
@@ -165,35 +177,46 @@
         .attr('height', d => chartHeight - yScale(initialResult[d]))
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
 
-      // Toggle function
-      let toggle = false;
+      // Function to update the chart based on the selected data
+      function updateChart(data) {
+        // Update scales
+        xScale.domain(Object.keys(data));
+        yScale.domain([0, d3.max(Object.values(data)) + 10]);
 
-      function toggleChart() {
-        toggle = !toggle;
-
-        // Recalculate the data based on the toggle state
-        const result = toggle ? computeAverageByGenderAndCategory(dataset) : initialResult;
-
-        // Update the Y-axis scale
-        yScale.domain([0, d3.max(Object.values(result)) + 10]);
-
-        // Update the bars with new data
-        svg.selectAll('rect')
-          .data(Object.keys(result))
+        // Update axes
+        svg.select('.x.axis')
           .transition()
-          .duration(500)
-          .attr('y', d => yScale(result[d]))
-          .attr('height', d => chartHeight - yScale(result[d]));
+          .call(xAxis);
 
-        // Update the Y-axis
         svg.select('.y.axis')
           .transition()
-          .duration(500)
           .call(yAxis);
+
+        // Update bars
+        bars.data(Object.keys(data))
+          .transition()
+          .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
+          .attr('y', d => yScale(data[d]))
+          .attr('width', xScale.rangeBand() / 2)
+          .attr('height', d => chartHeight - yScale(data[d]))
+          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
       }
 
-      // Expose the toggleChart function to the global scope
-      window.toggleChart = toggleChart;
+      // Toggle between charts
+      let isChart1 = true;
+
+      function toggleChart() {
+        isChart1 = !isChart1;
+
+        if (isChart1) {
+          updateChart(computeAverageByGender(dataset));
+        } else {
+          updateChart(computeAverageByGenderAndCategory(dataset));
+        }
+      }
+
+      // Initial chart
+      updateChart(initialResult);
     });
   </script>
 
