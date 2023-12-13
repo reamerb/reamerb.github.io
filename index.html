@@ -40,9 +40,9 @@ d3.csv('shopping_behavior_updated.csv', function(error, dataset) {
   const result = computeAverageByGender(dataset);
 
   // Set up the chart dimensions
-  const svgWidth = 400;
-  const svgHeight = 340; // Increased height to accommodate the label
-  const margin = { top: 20, right: 20, bottom: 40, left: 40 }; // Increased bottom margin
+  const svgWidth = 600; // Increased width by 50%
+  const svgHeight = 340; // Maintained the same height
+  const margin = { top: 20, right: 20, bottom: 40, left: 20 }; // Reduced left margin to center the chart
   const chartWidth = svgWidth - margin.left - margin.right;
   const chartHeight = svgHeight - margin.top - margin.bottom;
 
@@ -56,7 +56,7 @@ d3.csv('shopping_behavior_updated.csv', function(error, dataset) {
   // Create X and Y scales
   const xScale = d3.scale.ordinal()
     .domain(Object.keys(result))
-    .rangeBands([0, chartWidth], 0.2); // Reduced width and added padding
+    .rangeBands([0, chartWidth], 0.25); // Reduced width of bars by half
 
   const yScale = d3.scale.linear()
     .domain([0, 70]) // Capped the Y-axis at 70
