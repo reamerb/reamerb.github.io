@@ -190,12 +190,14 @@
           const average = computeAverageByGender(dataset)[d];
           const topCategories = getTopCategoriesByGender(dataset)[d];
           const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
-          let tooltipContent = `<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
+
+          // Generate tooltip content
+          let tooltipContent = `Gender: ${d}<br>Average Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
 
           // Add average purchase amount for each category
-          for (const category of topCategories) {
-            const key = d + '-' + category;
-            tooltipContent += `${category}: $${genderCategoryAverage[key].toFixed(2)}<br>`;
+          const sortedCategories = Object.keys(genderCategoryAverage).filter(key => key.startsWith(d + '-')).sort((a, b) => genderCategoryAverage[b] - genderCategoryAverage[a]);
+          for (const category of sortedCategories) {
+            tooltipContent += `${category.split('-')[1]}: $${genderCategoryAverage[category].toFixed(2)}<br>`;
           }
 
           tooltip.html(tooltipContent);
