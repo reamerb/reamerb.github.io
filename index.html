@@ -180,6 +180,11 @@
         .attr('class', 'y axis')
         .call(yAxis);
 
+      // Create tooltip
+      const tooltip = d3.select('.chart-container').append('div')
+        .attr('class', 'tooltip')
+        .style('display', 'none');
+
       // Function to update the chart based on the selected data
       function updateChart(data) {
         // Update scales
@@ -200,9 +205,6 @@
           .transition()
           .call(yAxis);
 
-        // Remove existing bars
-        svg.selectAll('rect').remove();
-
         // Create bars
         const bars = svg.selectAll('rect')
           .data(Object.keys(data))
@@ -215,7 +217,6 @@
           .attr('fill', d => d === 'Female' ? '#FFA3D2' : '#0583D2') // Change color of the bars
           .on('mouseover', function (d) {
             // Show tooltip on mouseover
-            const tooltip = d3.select('#tooltip');
             const average = computeAverageByGender(dataset)[d];
             const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
             const topCategories = getTopCategoriesByGender(dataset)[d];
@@ -237,7 +238,6 @@
           })
           .on('mouseout', function () {
             // Hide tooltip on mouseout
-            const tooltip = d3.select('#tooltip');
             tooltip.style('display', 'none');
           });
       }
@@ -245,6 +245,9 @@
       // Toggle between charts
       window.toggleChart = function () {
         isChart1 = !isChart1;
+
+        // Remove existing bars
+        svg.selectAll('rect').remove();
 
         if (isChart1) {
           updateChart(computeAverageByGender(dataset));
