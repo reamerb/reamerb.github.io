@@ -136,23 +136,15 @@
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,' + chartHeight + ')')
         .call(xAxis)
-        .append('text') // Label for X-axis
-        .attr('x', chartWidth / 2)
-        .attr('y', margin.bottom - 5)
-        .attr('dy', '1em')
-        .style('text-anchor', 'middle')
-        .text('Gender');
+        .selectAll('text') // Select all the text elements for rotation
+        .style('text-anchor', 'end') // Set text anchor to the end (right)
+        .attr('dx', '-.8em') // Adjust the position
+        .attr('dy', '.15em') // Adjust the position
+        .attr('transform', 'rotate(-45)'); // Rotate the text by -45 degrees
 
       svg.append('g')
         .attr('class', 'y axis')
-        .call(yAxis)
-        .append('text') // Label for Y-axis
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 0 - margin.left - 5)
-        .attr('x', 0 - chartHeight / 2)
-        .attr('dy', '1em')
-        .style('text-anchor', 'middle')
-        .text('Purchase Amount (USD)');
+        .call(yAxis);
 
       // Create bars
       const bars = svg.selectAll('rect')
@@ -174,7 +166,12 @@
         // Update axes
         svg.select('.x.axis')
           .transition()
-          .call(xAxis);
+          .call(xAxis)
+          .selectAll('text') // Select all the text elements for rotation
+          .style('text-anchor', 'end') // Set text anchor to the end (right)
+          .attr('dx', '-.8em') // Adjust the position
+          .attr('dy', '.15em') // Adjust the position
+          .attr('transform', 'rotate(-45)'); // Rotate the text by -45 degrees
 
         svg.select('.y.axis')
           .transition()
