@@ -91,7 +91,7 @@
         .rangeBands([0, chartWidth], 0.25);
 
       const yScale = d3.scale.linear()
-        .domain([0, 70]) // Capped the Y-axis at 70
+        .domain([0, d3.max(Object.values(result), d => d3.max(Object.values(d)))]) // Adjusted Y-axis domain
         .range([chartHeight, 0]);
 
       // Create X and Y axes
@@ -119,24 +119,15 @@
         .attr('class', 'y axis')
         .call(yAxis);
 
-      // Label the Y-axis
-      svg.append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 0 - margin.left - 5)
-        .attr('x', 0 - chartHeight / 2)
-        .attr('dy', '1em')
-        .style('text-anchor', 'middle')
-        .text('Purchase Amount (USD)');
-
       // Create bars
       svg.selectAll('rect')
         .data(Object.keys(result))
         .enter()
         .append('rect')
         .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', d => yScale(result[d]['Purchase Amount (USD)']))
+        .attr('y', d => yScale(result[d]['Purchase Amount (USD)'] || 0)) // Handle NaN or undefined values
         .attr('width', xScale.rangeBand() / 2)
-        .attr('height', d => chartHeight - yScale(result[d]['Purchase Amount (USD)']))
+        .attr('height', d => chartHeight - yScale(result[d]['Purchase Amount (USD)'] || 0)) // Handle NaN or undefined values
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
 
       // Label the bars
