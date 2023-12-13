@@ -96,9 +96,6 @@
         return averages;
       }
 
-      // Call the function and get the result
-      const initialResult = computeAverageByGender(dataset);
-
       // Set up the chart dimensions
       const svgWidth = 600; // Increased width by 50%
       const svgHeight = 700; // Increased height by 100
@@ -118,122 +115,77 @@
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-      // Create X and Y scales
-      const xScale = d3.scale.ordinal()
-        .domain(Object.keys(initialResult))
-        .rangeBands([0, chartWidth], 0.2); // Adjusted range for better spacing
+      // Function to update the chart based on the selected type
+      const updateChart = function (data) {
+        // Remove existing chart elements
+        svg.selectAll('*').remove();
 
-      const yScale = d3.scale.linear()
-        .domain([0, d3.max(Object.values(initialResult)) + 10]) // Adjusted Y-axis domain
-        .range([chartHeight, 0]);
+        // Create X and Y scales
+        const xScale = d3.scale.ordinal()
+          .domain(Object.keys(data))
+          .rangeBands([0, chartWidth], 0.2); // Adjusted range for better spacing
 
-      // Create X and Y axes
-      const xAxis = d3.svg.axis()
-        .scale(xScale)
-        .orient('bottom');
+        // Adjusted range for better spacing in the second chart
+        const adjustedXScale = d3.scale.ordinal()
+          .domain(Object.keys(data))
+          .rangeBands([0, chartWidth], 0.2);
 
-      const yAxis = d3.svg.axis()
-        .scale(yScale)
-        .orient('left');
+        const yScale = d3.scale.linear()
+          .domain([0, d3.max(Object.values(data)) + 10]) // Adjusted Y-axis domain
+          .range([chartHeight, 0]);
 
-      // Draw X and Y axes
-      svg.append('g')
-        .attr('class', 'x axis')
-        .attr('transform', 'translate(0,' + chartHeight + ')')
-        .call(xAxis)
-        .selectAll('text') // Rotate X-axis labels for better readability
-        .attr('transform', 'rotate(-45)')
-        .attr('dx', '-.8em')
-        .attr('dy', '.15em')
-        .style('text-anchor', 'end');
+        // Create X and Y axes
+        const xAxis = d3.svg.axis()
+          .scale(isChart1 ? xScale : adjustedXScale) // Use adjusted X-scale for the second chart
+          .orient('bottom');
 
-      svg.append('g')
-        .attr('class', 'y axis')
-        .call(yAxis)
-        .append('text') // Label for Y-axis
-        .attr('transform', 'rotate(-90)')
-        .attr('y', 0 - margin.left - 5)
-        .attr('x', 0 - chartHeight / 2)
-        .attr('dy', '1em')
-        .style('text-anchor', 'middle')
-        .text('Purchase Amount (USD)');
+        const yAxis = d3.svg.axis()
+          .scale(yScale)
+          .orient('left');
 
-      // Create bars
-      svg.selectAll('rect')
-        .data(Object.keys(initialResult))
-        .enter()
-        .append('rect')
-        .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', d => yScale(initialResult[d]))
-        .attr('width', xScale.rangeBand() / 2)
-        .attr('height', d => chartHeight - yScale(initialResult[d]))
-        .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
+        // Draw X and Y axes
+        svg.append('g')
+          .attr('class', 'x axis')
+          .attr('transform', 'translate(0,' + chartHeight + ')')
+          .call(xAxis)
+          .selectAll('text') // Rotate X-axis labels for better readability
+          .attr('transform', 'rotate(-45)')
+          .attr('dx', '-.8em')
+          .attr('dy', '.15em')
+          .style('text-anchor', 'end');
+
+        svg.append('g')
+          .attr('class', 'y axis')
+          .call(yAxis)
+          .append('text') // Label for Y-axis
+          .attr('transform', 'rotate(-90)')
+          .attr('y', 0 - margin.left - 5)
+          .attr('x', 0 - chartHeight / 2)
+          .attr('dy', '1em')
+          .style('text-anchor', 'middle')
+          .text('Purchase Amount (USD)');
+
+        // Create bars
+        svg.selectAll('rect')
+          .data(Object.keys(data))
+          .enter()
+          .append('rect')
+          .attr('x', d => isChart1 ? xScale(d) + xScale.rangeBand() / 4 : adjustedXScale(d) + adjustedXScale.rangeBand() / 4)
+          .attr('y', d => yScale(data[d]))
+          .attr('width', isChart1 ? xScale.rangeBand() / 2 : adjustedXScale.rangeBand() / 2)
+          .attr('height', d => chartHeight - yScale(data[d]))
+          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
+      };
+
+      // Call the function and get the result
+      const initialResult = computeAverageByGender(dataset);
+
+      // Initial chart
+      updateChart(initialResult);
 
       // Toggle button function
       const toggleChart = function () {
         const isChart1 = svg.selectAll('rect').data().length > 0;
-
-        // Function to update the chart based on the selected type
-        const updateChart = function (data) {
-          // Remove existing chart elements
-          svg.selectAll('*').remove();
-
-          // Create X and Y scales
-          const xScale = d3.scale.ordinal()
-            .domain(Object.keys(data))
-            .rangeBands([0, chartWidth], 0.25);
-
-          // Adjusted range for better spacing in the second chart
-          const adjustedXScale = d3.scale.ordinal()
-            .domain(Object.keys(data))
-            .rangeBands([0, chartWidth], 0.2);
-
-          const yScale = d3.scale.linear()
-            .domain([0, d3.max(Object.values(data)) + 10]) // Adjusted Y-axis domain
-            .range([chartHeight, 0]);
-
-          // Create X and Y axes
-          const xAxis = d3.svg.axis()
-            .scale(isChart1 ? xScale : adjustedXScale) // Use adjusted X-scale for the second chart
-            .orient('bottom');
-
-          const yAxis = d3.svg.axis()
-            .scale(yScale)
-            .orient('left');
-
-          // Draw X and Y axes
-          svg.append('g')
-            .attr('class', 'x axis')
-            .attr('transform', 'translate(0,' + chartHeight + ')')
-            .call(xAxis)
-            .selectAll('text') // Rotate X-axis labels for better readability
-            .attr('transform', 'rotate(-45)')
-            .attr('dx', '-.8em')
-            .attr('dy', '.15em')
-            .style('text-anchor', 'end');
-
-          svg.append('g')
-            .attr('class', 'y axis')
-            .call(yAxis)
-            .append('text') // Label for Y-axis
-            .attr('transform', 'rotate(-90)')
-            .attr('y', 0 - margin.left - 5)
-            .attr('x', 0 - chartHeight / 2)
-            .attr('dy', '1em')
-            .style('text-anchor', 'middle')
-            .text('Purchase Amount (USD)');
-
-          // Create bars
-          svg.selectAll('rect')
-            .data(Object.keys(data))
-            .enter()
-            .append('rect')
-            .attr('x', d => isChart1 ? xScale(d) + xScale.rangeBand() / 4 : adjustedXScale(d) + adjustedXScale.rangeBand() / 4)
-            .attr('y', d => yScale(data[d]))
-            .attr('width', isChart1 ? xScale.rangeBand() / 2 : adjustedXScale.rangeBand() / 2)
-            .attr('height', d => chartHeight - yScale(data[d]))
-            .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
-        };
 
         // Update chart based on the selected type
         if (isChart1) {
@@ -243,8 +195,8 @@
         }
       };
 
-      // Initial chart
-      updateChart(initialResult);
+      // Button click event
+      d3.select('#button-container button').on('click', toggleChart);
     });
   </script>
 
