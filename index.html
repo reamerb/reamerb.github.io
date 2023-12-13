@@ -32,7 +32,6 @@
       function computeAverageByGender(data) {
         const sums = {};
         const counts = {};
-        const averages = {};
 
         // Iterate through the data to calculate sums and counts
         data.forEach(function (d) {
@@ -41,23 +40,12 @@
 
           sums[gender] = (sums[gender] || 0) + purchaseAmount;
           counts[gender] = (counts[gender] || 0) + 1;
-
-          // Calculate averages per category
-          if (!averages[gender]) {
-            averages[gender] = {};
-          }
-
-          const categories = Object.keys(d).filter(key => key !== 'Gender' && key !== 'Purchase Amount (USD)');
-          categories.forEach(category => {
-            averages[gender][category] = (averages[gender][category] || 0) + parseFloat(d[category]);
-          });
         });
 
-        // Calculate final averages per category
-        for (const gender in averages) {
-          for (const category in averages[gender]) {
-            averages[gender][category] /= counts[gender];
-          }
+        // Calculate averages
+        const averages = {};
+        for (const gender in sums) {
+          averages[gender] = sums[gender] / counts[gender];
         }
 
         return averages;
@@ -91,7 +79,7 @@
         .rangeBands([0, chartWidth], 0.25);
 
       const yScale = d3.scale.linear()
-        .domain([0, d3.max(Object.values(result), d => d3.max(Object.values(d)))]) // Adjusted Y-axis domain
+        .domain([0, d3.max(Object.values(result))]) // Adjusted Y-axis domain
         .range([chartHeight, 0]);
 
       // Create X and Y axes
@@ -125,9 +113,9 @@
         .enter()
         .append('rect')
         .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', d => yScale(result[d]['Purchase Amount (USD)'] || 0)) // Handle NaN or undefined values
+        .attr('y', d => yScale(result[d]))
         .attr('width', xScale.rangeBand() / 2)
-        .attr('height', d => chartHeight - yScale(result[d]['Purchase Amount (USD)'] || 0)) // Handle NaN or undefined values
+        .attr('height', d => chartHeight - yScale(result[d]))
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
 
       // Label the bars
