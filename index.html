@@ -190,7 +190,7 @@
           const average = computeAverageByGender(dataset)[d];
           const topCategories = getTopCategoriesByGender(dataset)[d];
           const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
-          const tooltipContent = `<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
+          let tooltipContent = `<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
 
           // Add average purchase amount for each category
           for (const category of topCategories) {
