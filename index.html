@@ -92,14 +92,6 @@
         .attr('transform', 'translate(0,' + chartHeight + ')')
         .call(xAxis);
 
-      // Label for X-axis (centered "Sex")
-      svg.append('text')
-        .attr('x', chartWidth / 2)
-        .attr('y', chartHeight + margin.bottom - 5)
-        .attr('dy', '1em')
-        .style('text-anchor', 'middle')
-        .text('Sex');
-
       svg.append('g')
         .attr('class', 'y axis')
         .call(yAxis);
