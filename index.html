@@ -82,22 +82,10 @@
           counts[key] = (counts[key] || 0) + 1;
         });
 
-        // Filter to include only the top two categories for each gender
-        const filteredSums = {};
-        const filteredCounts = {};
-
-        for (const key in sums) {
-          const [gender] = key.split('-');
-          if (!filteredSums[gender] || sums[key] > filteredSums[gender]) {
-            filteredSums[gender] = sums[key];
-            filteredCounts[gender] = counts[key];
-          }
-        }
-
         // Calculate averages
         const averages = {};
-        for (const key in filteredSums) {
-          averages[key] = filteredSums[key] / filteredCounts[key];
+        for (const key in sums) {
+          averages[key] = sums[key] / counts[key];
         }
 
         return averages;
