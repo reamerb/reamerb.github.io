@@ -84,8 +84,11 @@
 
         // Calculate averages
         const averages = {};
-        for (const key in sums) {
-          averages[key] = sums[key] / counts[key];
+        for (const gender in sums) {
+          for (const category in counts) {
+            const key = gender + '-' + category;
+            averages[key] = sums[key] / counts[key];
+          }
         }
 
         return averages;
