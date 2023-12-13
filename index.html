@@ -70,8 +70,13 @@
         const sums = {};
         const counts = {};
 
-        // Calculate average purchase amounts for each gender and category
-        data.forEach(function (d) {
+        // Filter data for the top two categories
+        const filteredData = data.filter(function (d) {
+          return d.Category === 'Category1' || d.Category === 'Category2';
+        });
+
+        // Iterate through the filtered data to calculate sums and counts
+        filteredData.forEach(function (d) {
           const gender = d.Gender;
           const category = d.Category;
           const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
@@ -88,37 +93,7 @@
           averages[key] = sums[key] / counts[key];
         }
 
-        // Identify the top two categories for each gender
-        const topCategories = {};
-        for (const gender in counts) {
-          const categoryAverages = [];
-          for (const category in counts) {
-            if (category.startsWith(gender)) {
-              const key = gender + '-' + category;
-              categoryAverages.push({ key, average: averages[key] || 0 });
-            }
-          }
-
-          // Sort categories by average purchase amount
-          categoryAverages.sort((a, b) => b.average - a.average);
-
-          // Select the top two categories
-          const topTwoCategories = categoryAverages.slice(0, 2);
-
-          // Update top categories object
-          topTwoCategories.forEach(item => {
-            const [gender, category] = item.key.split('-');
-            topCategories[item.key] = { Gender: gender, Category: category };
-          });
-        }
-
-        // Filter the data based on the identified top categories
-        const filteredData = data.filter(d => {
-          const key = d.Gender + '-' + d.Category;
-          return topCategories.hasOwnProperty(key);
-        });
-
-        return computeAverageByGender(filteredData);
+        return averages;
       }
 
       // Call the function and get the result
