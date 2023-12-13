@@ -156,7 +156,7 @@
         .attr('y', d => yScale(initialResult[d]))
         .attr('width', xScale.rangeBand() / 2)
         .attr('height', d => chartHeight - yScale(initialResult[d]))
-        .attr('fill', (d, i) => i === 'Male' ? '#0583D2' : '#FFA3D2'); // Change color of the bars
+        .attr('fill', (d) => d === 'Male' ? '#0583D2' : '#FFA3D2'); // Change color of the bars
 
       // Create bars for chart2 (initialize with hidden bars)
       const bars2 = svg.selectAll('.bar2')
@@ -197,7 +197,7 @@
           .attr('y', d => yScale(data[d]))
           .attr('width', xScale.rangeBand() / 2)
           .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', (d, i) => i === 'Male' ? '#0583D2' : '#FFA3D2'); // Change color of the bars
+          .attr('fill', (d) => d === 'Male' ? '#0583D2' : '#FFA3D2'); // Change color of the bars
 
         // Update bars for chart2
         bars2.data(Object.keys(data))
@@ -216,9 +216,25 @@
         isChart1 = !isChart1;
 
         if (isChart1) {
-          updateChart(computeAverageByGender(dataset));
+          // Hide bars for chart2
+          bars2.transition()
+            .attr('y', chartHeight)
+            .attr('height', 0);
+
+          // Show bars for chart1
+          bars1.transition()
+            .attr('y', d => yScale(initialResult[d]))
+            .attr('height', d => chartHeight - yScale(initialResult[d]));
         } else {
-          updateChart(computeAverageByGenderAndCategory(dataset));
+          // Hide bars for chart1
+          bars1.transition()
+            .attr('y', chartHeight)
+            .attr('height', 0);
+
+          // Show bars for chart2
+          bars2.transition()
+            .attr('y', d => yScale(initialResult[d]))
+            .attr('height', d => chartHeight - yScale(initialResult[d]));
         }
       };
 
