@@ -70,13 +70,8 @@
         const sums = {};
         const counts = {};
 
-        // Filter data for the top two categories
-        const filteredData = data.filter(function (d) {
-          return d.Category === 'Category1' || d.Category === 'Category2';
-        });
-
-        // Iterate through the filtered data to calculate sums and counts
-        filteredData.forEach(function (d) {
+        // Iterate through the data to calculate sums and counts
+        data.forEach(function (d) {
           const gender = d.Gender;
           const category = d.Category;
           const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
@@ -105,7 +100,7 @@
       const margin = {
         top: 20,
         right: 20,
-        bottom: 110, // Increased bottom margin
+        bottom: 105, // Increased bottom margin
         left: 50
       };
       const chartWidth = svgWidth - margin.left - margin.right;
