@@ -28,31 +28,38 @@
     d3.csv('shopping_behavior_updated.csv', function (error, dataset) {
       if (error) throw error;
 
-      // Function to compute average purchase amount grouped by gender
-      function computeAverageByGender(data) {
+      // Function to compute average purchase amount grouped by gender and category
+      function computeAverageByGenderAndCategory(data) {
         const sums = {};
         const counts = {};
 
         // Iterate through the data to calculate sums and counts
         data.forEach(function (d) {
           const gender = d.Gender;
+          const category = d.Category;
           const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
 
-          sums[gender] = (sums[gender] || 0) + purchaseAmount;
-          counts[gender] = (counts[gender] || 0) + 1;
+          if (!sums[gender]) sums[gender] = {};
+          sums[gender][category] = (sums[gender][category] || 0) + purchaseAmount;
+
+          if (!counts[gender]) counts[gender] = {};
+          counts[gender][category] = (counts[gender][category] || 0) + 1;
         });
 
         // Calculate averages
         const averages = {};
         for (const gender in sums) {
-          averages[gender] = sums[gender] / counts[gender];
+          averages[gender] = {};
+          for (const category in sums[gender]) {
+            averages[gender][category] = sums[gender][category] / counts[gender][category];
+          }
         }
 
         return averages;
       }
 
       // Call the function and get the result
-      const result = computeAverageByGender(dataset);
+      const resultByCategory = computeAverageByGenderAndCategory(dataset);
 
       // Set up the chart dimensions
       const svgWidth = 600; // Increased width by 50%
@@ -65,6 +72,7 @@
       };
       const chartWidth = svgWidth - margin.left - margin.right;
       const chartHeight = svgHeight - margin.top - margin.bottom;
+      const barPadding = 0.2;
 
       // Create an SVG element
       const svg = d3.select('body').append('svg')
@@ -74,12 +82,13 @@
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
       // Create X and Y scales
+      const categories = Array.from(new Set(dataset.map(d => d.Category)));
       const xScale = d3.scale.ordinal()
-        .domain(Object.keys(result))
-        .rangeBands([0, chartWidth], 0.25);
+        .domain(categories)
+        .rangeBands([0, chartWidth], barPadding);
 
       const yScale = d3.scale.linear()
-        .domain([0, d3.max(Object.values(result)) +10]) // Adjusted Y-axis domain
+        .domain([0, d3.max(Object.values(resultByCategory).flatMap(gender => Object.values(gender)))])
         .range([chartHeight, 0]);
 
       // Create X and Y axes
@@ -101,7 +110,7 @@
         .attr('y', margin.bottom - 5)
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
-        .text('Gender');
+        .text('Category');
 
       svg.append('g')
         .attr('class', 'y axis')
@@ -112,17 +121,24 @@
         .attr('x', 0 - chartHeight / 2)
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
-        .text('Average Purchase Amount (USD)');
+        .text('Purchase Amount (USD)');
 
       // Create bars
-      svg.selectAll('rect')
-        .data(Object.keys(result))
+      const genderGroups = svg.selectAll('.gender-group')
+        .data(Object.keys(resultByCategory))
+        .enter()
+        .append('g')
+        .attr('class', 'gender-group')
+        .attr('transform', d => 'translate(' + xScale.rangeBand() * categories.indexOf(d) + ', 0)');
+
+      genderGroups.selectAll('rect')
+        .data(d => Object.entries(resultByCategory[d]))
         .enter()
         .append('rect')
-        .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', d => yScale(result[d]))
-        .attr('width', xScale.rangeBand() / 2)
-        .attr('height', d => chartHeight - yScale(result[d]))
+        .attr('x', d => xScale(d[0]))
+        .attr('y', d => yScale(d[1]))
+        .attr('width', xScale.rangeBand())
+        .attr('height', d => chartHeight - yScale(d[1]))
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
     });
   </script>
