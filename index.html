@@ -180,44 +180,6 @@
         .attr('class', 'y axis')
         .call(yAxis);
 
-      // Create bars
-      const bars = svg.selectAll('rect')
-        .data(Object.keys(computeAverageByGender(dataset)))
-        .enter()
-        .append('rect')
-        .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', d => yScale(computeAverageByGender(dataset)[d]))
-        .attr('width', xScale.rangeBand() / 2)
-        .attr('height', d => chartHeight - yScale(computeAverageByGender(dataset)[d]))
-        .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2') // Change color of the bars
-        .on('mouseover', function (d) {
-          // Show tooltip on mouseover
-          const tooltip = d3.select('#tooltip');
-          const average = computeAverageByGender(dataset)[d];
-          const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
-          const topCategories = getTopCategoriesByGender(dataset)[d];
-
-          // Generate tooltip content
-          let tooltipContent = `Gender: ${d}<br>Average Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
-
-          // Add average purchase amount for each category
-          const sortedCategories = Object.keys(genderCategoryAverage).filter(key => key.startsWith(d + '-')).sort((a, b) => genderCategoryAverage[b] - genderCategoryAverage[a]);
-          for (const category of sortedCategories) {
-            tooltipContent += `${category.split('-')[1]}: $${genderCategoryAverage[category].toFixed(2)}<br>`;
-          }
-
-          tooltip.html(tooltipContent);
-
-          tooltip.style('left', (d3.event.pageX + 10) + 'px')
-            .style('top', (d3.event.pageY - 10) + 'px')
-            .style('display', 'block');
-        })
-        .on('mouseout', function () {
-          // Hide tooltip on mouseout
-          const tooltip = d3.select('#tooltip');
-          tooltip.style('display', 'none');
-        });
-
       // Function to update the chart based on the selected data
       function updateChart(data) {
         // Update scales
@@ -238,14 +200,46 @@
           .transition()
           .call(yAxis);
 
-        // Update bars
-        bars.data(Object.keys(data))
-          .transition()
+        // Select all existing bars and remove them before appending new ones
+        svg.selectAll('rect').remove();
+
+        // Create bars
+        const bars = svg.selectAll('rect')
+          .data(Object.keys(data))
+          .enter()
+          .append('rect')
           .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
           .attr('y', d => yScale(data[d]))
           .attr('width', xScale.rangeBand() / 2)
           .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
+          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2') // Change color of the bars
+          .on('mouseover', function (d) {
+            // Show tooltip on mouseover
+            const tooltip = d3.select('#tooltip');
+            const average = computeAverageByGender(dataset)[d];
+            const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
+            const topCategories = getTopCategoriesByGender(dataset)[d];
+
+            // Generate tooltip content
+            let tooltipContent = `Gender: ${d}<br>Average Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
+
+            // Add average purchase amount for each category
+            const sortedCategories = Object.keys(genderCategoryAverage).filter(key => key.startsWith(d + '-')).sort((a, b) => genderCategoryAverage[b] - genderCategoryAverage[a]);
+            for (const category of sortedCategories) {
+              tooltipContent += `${category.split('-')[1]}: $${genderCategoryAverage[category].toFixed(2)}<br>`;
+            }
+
+            tooltip.html(tooltipContent);
+
+            tooltip.style('left', (d3.event.pageX + 10) + 'px')
+              .style('top', (d3.event.pageY - 10) + 'px')
+              .style('display', 'block');
+          })
+          .on('mouseout', function () {
+            // Hide tooltip on mouseout
+            const tooltip = d3.select('#tooltip');
+            tooltip.style('display', 'none');
+          });
       }
 
       // Toggle between charts
