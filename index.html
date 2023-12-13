@@ -205,7 +205,7 @@
       // Toggle between charts
       let isChart1 = true;
 
-      function toggleChart() {
+      window.toggleChart = function() {
         isChart1 = !isChart1;
 
         if (isChart1) {
@@ -213,7 +213,7 @@
         } else {
           updateChart(computeAverageByGenderAndCategory(dataset));
         }
-      }
+      };
 
       // Initial chart
       updateChart(initialResult);
