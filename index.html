@@ -70,8 +70,13 @@
         const sums = {};
         const counts = {};
 
-        // Iterate through the data to calculate sums and counts
-        data.forEach(function (d) {
+        // Filter data for the top two categories
+        const filteredData = data.filter(function (d) {
+          return d.Category === 'Category1' || d.Category === 'Category2';
+        });
+
+        // Iterate through the filtered data to calculate sums and counts
+        filteredData.forEach(function (d) {
           const gender = d.Gender;
           const category = d.Category;
           const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
@@ -155,7 +160,7 @@
         .text('Purchase Amount (USD)');
 
       // Create bars
-      const bars = svg.selectAll('rect')
+      svg.selectAll('rect')
         .data(Object.keys(initialResult))
         .enter()
         .append('rect')
@@ -165,41 +170,73 @@
         .attr('height', d => chartHeight - yScale(initialResult[d]))
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
 
-      // Function to update the chart based on the selected data
-      function updateChart(data) {
-        // Update scales
-        xScale.domain(Object.keys(data));
-        yScale.domain([0, d3.max(Object.values(data)) + 10]);
+      // Toggle button function
+      const toggleChart = function () {
+        const isChart1 = svg.selectAll('rect').data().length > 0;
 
-        // Update axes
-        svg.select('.x.axis')
-          .transition()
-          .call(xAxis);
+        // Function to update the chart based on the selected type
+        const updateChart = function (data) {
+          // Remove existing chart elements
+          svg.selectAll('*').remove();
 
-        svg.select('.y.axis')
-          .transition()
-          .call(yAxis);
+          // Create X and Y scales
+          const xScale = d3.scale.ordinal()
+            .domain(Object.keys(data))
+            .rangeBands([0, chartWidth], 0.25);
 
-        // Update bars
-        bars.data(Object.keys(data))
-          .transition()
-          .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-          .attr('y', d => yScale(data[d]))
-          .attr('width', xScale.rangeBand() / 2)
-          .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
-      }
+          const yScale = d3.scale.linear()
+            .domain([0, d3.max(Object.values(data)) + 10]) // Adjusted Y-axis domain
+            .range([chartHeight, 0]);
 
-      // Toggle between charts
-      let isChart1 = true;
+          // Create X and Y axes
+          const xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient('bottom');
 
-      window.toggleChart = function() {
-        isChart1 = !isChart1;
+          const yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient('left');
 
+          // Draw X and Y axes
+          svg.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + chartHeight + ')')
+            .call(xAxis)
+            .append('text') // Label for X-axis
+            .attr('x', chartWidth / 2)
+            .attr('y', margin.bottom - 5)
+            .attr('dy', '1em')
+            .style('text-anchor', 'middle')
+            .text('Gender');
+
+          svg.append('g')
+            .attr('class', 'y axis')
+            .call(yAxis)
+            .append('text') // Label for Y-axis
+            .attr('transform', 'rotate(-90)')
+            .attr('y', 0 - margin.left - 5)
+            .attr('x', 0 - chartHeight / 2)
+            .attr('dy', '1em')
+            .style('text-anchor', 'middle')
+            .text('Purchase Amount (USD)');
+
+          // Create bars
+          svg.selectAll('rect')
+            .data(Object.keys(data))
+            .enter()
+            .append('rect')
+            .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
+            .attr('y', d => yScale(data[d]))
+            .attr('width', xScale.rangeBand() / 2)
+            .attr('height', d => chartHeight - yScale(data[d]))
+            .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
+        };
+
+        // Update chart based on the selected type
         if (isChart1) {
-          updateChart(computeAverageByGender(dataset));
-        } else {
           updateChart(computeAverageByGenderAndCategory(dataset));
+        } else {
+          updateChart(computeAverageByGender(dataset));
         }
       };
 
