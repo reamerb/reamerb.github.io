@@ -191,14 +191,15 @@
           const topCategories = getTopCategoriesByGender(dataset)[d];
           const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
           const tooltipContent = `<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
-          
+
           // Add average purchase amount for each category
-          for (const category in genderCategoryAverage) {
-            tooltipContent += `${category}: $${genderCategoryAverage[category][d].toFixed(2)}<br>`;
+          for (const category of topCategories) {
+            const key = d + '-' + category;
+            tooltipContent += `${category}: $${genderCategoryAverage[key].toFixed(2)}<br>`;
           }
 
           tooltip.html(tooltipContent);
-          
+
           tooltip.style('left', (d3.event.pageX + 10) + 'px')
             .style('top', (d3.event.pageY - 10) + 'px')
             .style('display', 'block');
