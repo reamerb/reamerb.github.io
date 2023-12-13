@@ -84,11 +84,12 @@
 
         // Calculate averages
         const averages = {};
-        for (const gender in sums) {
-          for (const category in counts) {
-            const key = gender + '-' + category;
-            averages[key] = sums[key] / counts[key];
+        for (const key in sums) {
+          const [gender, category] = key.split('-');
+          if (!averages[gender]) {
+            averages[gender] = {};
           }
+          averages[gender][category] = sums[key] / counts[key];
         }
 
         return averages;
@@ -153,18 +154,23 @@
       const bars = svg.selectAll('rect')
         .data(Object.keys(initialResult))
         .enter()
+        .append('g')
+        .attr('transform', d => 'translate(' + xScale(d) + ',0)')
+        .selectAll('rect')
+        .data(d => Object.keys(initialResult[d]).map(category => ({ gender: d, category, value: initialResult[d][category] })))
+        .enter()
         .append('rect')
-        .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-        .attr('y', d => yScale(initialResult[d]))
+        .attr('x', d => xScale(d.gender) + xScale.rangeBand() / 4)
+        .attr('y', d => yScale(d.value))
         .attr('width', xScale.rangeBand() / 2)
-        .attr('height', d => chartHeight - yScale(initialResult[d]))
+        .attr('height', d => chartHeight - yScale(d.value))
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
 
       // Function to update the chart based on the selected data
       function updateChart(data) {
         // Update scales
         xScale.domain(Object.keys(data));
-        yScale.domain([0, d3.max(Object.values(data)) + 10]);
+        yScale.domain([0, d3.max(Object.values(data).map(d => d3.max(Object.values(d)))) + 10]);
 
         // Update axes
         svg.select('.x.axis')
@@ -182,11 +188,13 @@
 
         // Update bars
         bars.data(Object.keys(data))
+          .selectAll('rect')
+          .data(d => Object.keys(data[d]).map(category => ({ gender: d, category, value: data[d][category] })))
           .transition()
-          .attr('x', d => xScale(d) + xScale.rangeBand() / 4)
-          .attr('y', d => yScale(data[d]))
+          .attr('x', d => xScale(d.gender) + xScale.rangeBand() / 4)
+          .attr('y', d => yScale(d.value))
           .attr('width', xScale.rangeBand() / 2)
-          .attr('height', d => chartHeight - yScale(data[d]))
+          .attr('height', d => chartHeight - yScale(d.value))
           .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
       }
 
