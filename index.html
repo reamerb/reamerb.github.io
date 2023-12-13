@@ -33,7 +33,7 @@
 
     <!-- Button Container -->
     <div id="button-container">
-      <button onclick="toggleChart()">Toggle Chart</button>
+      <button id="toggleButton">Toggle Chart</button>
     </div>
   </div>
 
@@ -229,7 +229,7 @@
         .attr('fill', (d, i) => i === 1 ? '#FFA3D2' : '#0583D2'); // Change color of the bars
 
       // Toggle button function
-      const toggleChart = function () {
+      document.getElementById('toggleButton').addEventListener('click', function () {
         const isChart1 = svg.selectAll('rect').data().length > 0;
 
         // Update chart based on the selected type
@@ -238,10 +238,7 @@
         } else {
           updateChart(computeAverageByGender(dataset));
         }
-      };
-
-      // Initial chart
-      updateChart(initialResult);
+      });
     });
   </script>
 
