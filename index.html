@@ -137,10 +137,13 @@
         .on('mouseover', function (event, d) {
           // Show tooltip on mouseover
           const tooltip = d3.select('#tooltip');
-          tooltip.html(`<strong>${d}</strong><br>Average Purchase Amount: $${computeAverageByGender(dataset)[d].toFixed(2)}`);
-          tooltip.style('left', (event.pageX + 10) + 'px')
-            .style('top', (event.pageY - 10) + 'px')
-            .style('display', 'block');
+          const average = computeAverageByGender(dataset)[d];
+          if (average !== undefined) {
+            tooltip.html(`<strong>${d}</strong><br>Average Purchase Amount: $${average.toFixed(2)}`);
+            tooltip.style('left', (event.pageX + 10) + 'px')
+              .style('top', (event.pageY - 10) + 'px')
+              .style('display', 'block');
+          }
         })
         .on('mouseout', function () {
           // Hide tooltip on mouseout
