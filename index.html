@@ -90,10 +90,12 @@
       svg.append('g')
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,' + chartHeight + ')')
-        .call(xAxis)
-        .append('text') // Label for X-axis
+        .call(xAxis);
+
+      // Label for X-axis (centered "Gender")
+      svg.append('text')
         .attr('x', chartWidth / 2)
-        .attr('y', margin.bottom - 5)
+        .attr('y', chartHeight + margin.bottom - 5)
         .attr('dy', '1em')
         .style('text-anchor', 'middle')
         .text('Gender');
