@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centered Divs</title>
+    <title>Centered Divs with Scroll</title>
     <style>
         body {
             display: flex;
@@ -11,10 +11,13 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow-y: auto; /* Enable vertical scroll for the entire body */
         }
 
         .container {
             text-align: center;
+            max-height: 80vh; /* Set a max height to trigger the vertical scroll */
+            overflow-y: auto; /* Enable vertical scroll for the container */
         }
 
         #header {
@@ -27,7 +30,7 @@
         }
 
         #image-container {
-            margin-top: 20px; /* Adjust the margin as needed */
+            margin-top: 20px;
         }
 
     </style>
@@ -35,31 +38,17 @@
 <body>
     <div class="container">
         <div id="header">Write-Up Page<br><br></div>
-        <div id="body-text">The design of this visualization is largely inspired by what I saw during my critique assignment, when I analyzed what I thought worked and what I thought didn't.<br><br>
-	To begin, a simple bar chart was chosen for this visualization because the comparison that is being made is relatively simple. The dataset provides a snapshot of
-	data, without dates for the sake of comparisons over time. As such, a bar chart seemed a succinct way to represent the data set and the answers to the question being
-	asked. Below is the initial mock-up for what I had envisioned at the start of this project. As you can see, the initial mock-up contains a lot of the elements that
-	would eventually make it into the final visualization. From the beginning, I wanted a chart that displayed the answer to the initial question: if one gender
-	spent more on average than the other and a secondary chart that provides a more detailed breakdown. I also wanted a tooltip to pop up when the bars were 
-	hovered over. The data contained in the secondary chart is technically redundant with the data contained within the tooltip, but I believe that it was
-	necessary to include both because I thought it was helpful to be able to see the exact numbers and to see, visually, how they compare with one another.
-	The purchase amount columns were encoded via color by gender. For males, the column was encoded as blue and for females the column was encoded as pink.
-	This was done for a simple reason: at a glance, you immediately know which column is which. While perhaps it is somewhat stereotypical, those are the colors that
-	our culture tends to associate with each gender. Additionally, the decision was consciously made to set the maximum height of the bar chart 10 unites higher
-	than the top of each bar. This decision was made because, to be blunt, it looked better. it does not skew the visualization and it is still easy to see how 
-	close the averages are. A notable disinclusion from the mock-up to the final visualization is the presence of multiple buttons, which would activate whatever
-	visualization one wished to see at a given time. With two charts, it is easy enough to just click the button again to get to the other one. The decision was made
-	consciously that the x-axis didn't need an overall label describing what it is -- it seemed self explanatory enough what the axis was conveying via the column
-	labels. The decision not to include a tooltip on the breakdown chart was also intentional -- it would have been directly redundant, as the data is already
-	represented by the columns.<br> </div>
+        <div id="body-text">
+            <!-- Your lengthy text here -->
+        </div>
 
-	<div id="image-container">
+        <div id="image-container">
             <img src="mock_up.jpg" alt="Hand-written depiction that resembles the current charts." width="800" height="600">
-	</div>
-	<div id ="body-text">The findings for this visualization were not super surprising overall. We found that men and women spend approximately the same amount per purchase, on average.
-	That alone is not groundbreaking, but the further breakdown provides interesting context. Outerwear was the lowest of the top 4 categories for both sexes, and
-	clothing was the second category for both sexes. What surprised me is that men's top category was footwear and women's was accessories. For each gender, the other
-	gender's top category took their third place.</div>
+        </div>
+
+        <div id="body-text">
+            <!-- Additional text here -->
+        </div>
     </div>
 </body>
 </html>
