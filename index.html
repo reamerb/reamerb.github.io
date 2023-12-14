@@ -20,7 +20,7 @@
     }
 
     .chart {
-      margin-bottom: 50px; /* Increased bottom margin */
+      margin-bottom: 50px;
     }
 
     .tooltip {
@@ -32,7 +32,6 @@
       border-radius: 5px;
       pointer-events: none;
     }
-
 
     #title-container {
       text-align: center;
@@ -52,7 +51,6 @@
       left: 650px;
       top: 80px;
     }
-
   </style>
 </head>
 
@@ -73,6 +71,10 @@
     <button onclick="toggleChart()">Toggle Chart</button>
   </div>
 
+  <div id="write-up-link-container" style="text-align: center; margin-top: 20px;">
+    <a href="https://reamerb.github.io/writeup.html" target="_blank">Write-up Page</a>
+  </div>
+
   <script>
     // Load the CSV data
     d3.csv('shopping_behavior_updated.csv', function (error, dataset) {
@@ -80,12 +82,10 @@
 
       let isChart1 = true;
 
-      // Function to compute average purchase amount grouped by gender
       function computeAverageByGender(data) {
         const sums = {};
         const counts = {};
 
-        // Iterate through the data to calculate sums and counts
         data.forEach(function (d) {
           const gender = d.Gender;
           const purchaseAmount = parseFloat(d['Purchase Amount (USD)']);
@@ -94,7 +94,6 @@
           counts[gender] = (counts[gender] || 0) + 1;
         });
 
-        // Calculate averages
         const averages = {};
         for (const gender in sums) {
           averages[gender] = sums[gender] / counts[gender];
@@ -103,7 +102,6 @@
         return averages;
       }
 
-      // Function to get the top categories for each gender
       function getTopCategoriesByGender(data) {
         const categoriesByGender = {};
 
@@ -118,7 +116,6 @@
           categoriesByGender[gender][category] = (categoriesByGender[gender][category] || 0) + 1;
         });
 
-        // Sort categories by frequency in descending order
         for (const gender in categoriesByGender) {
           const sortedCategories = Object.keys(categoriesByGender[gender]).sort((a, b) => categoriesByGender[gender][b] - categoriesByGender[gender][a]);
           categoriesByGender[gender] = sortedCategories.slice(0, 4);
@@ -127,12 +124,10 @@
         return categoriesByGender;
       }
 
-      // Function to compute average purchase amount for each gender and category
       function computeAverageByGenderAndCategory(data) {
         const sums = {};
         const counts = {};
 
-        // Iterate through the data to calculate sums and counts
         data.forEach(function (d) {
           const gender = d.Gender;
           const category = d.Category;
@@ -144,7 +139,6 @@
           counts[key] = (counts[key] || 0) + 1;
         });
 
-        // Calculate averages
         const averages = {};
         for (const key in sums) {
           averages[key] = sums[key] / counts[key];
@@ -153,35 +147,31 @@
         return averages;
       }
 
-      // Set up the chart dimensions
-      const svgWidth = 600; // Increased width by 50%
-      const svgHeight = 700; // Increased height by 100
+      const svgWidth = 600;
+      const svgHeight = 700;
       const margin = {
         top: 20,
         right: 20,
-        bottom: 110, // Increased bottom margin
+        bottom: 110,
         left: 50
       };
       const chartWidth = svgWidth - margin.left - margin.right;
       const chartHeight = svgHeight - margin.top - margin.bottom;
 
-      // Create an SVG element
       const svg = d3.select('.chart').append('svg')
         .attr('width', svgWidth)
         .attr('height', svgHeight)
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-      // Create X and Y scales
       const xScale = d3.scale.ordinal()
         .domain(Object.keys(computeAverageByGender(dataset)))
         .rangeBands([0, chartWidth], 0.25);
 
       const yScale = d3.scale.linear()
-        .domain([0, d3.max(Object.values(computeAverageByGender(dataset))) + 10]) // Adjusted Y-axis domain
+        .domain([0, d3.max(Object.values(computeAverageByGender(dataset))) + 10])
         .range([chartHeight, 0]);
 
-      // Create X and Y axes
       const xAxis = d3.svg.axis()
         .scale(xScale)
         .orient('bottom');
@@ -190,22 +180,20 @@
         .scale(yScale)
         .orient('left');
 
-      // Draw X and Y axes
       svg.append('g')
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,' + chartHeight + ')')
         .call(xAxis)
-        .selectAll('text') // Select all the text elements for rotation
-        .style('text-anchor', 'end') // Set text anchor to the end (right)
-        .attr('dx', '-.8em') // Adjust the position
-        .attr('dy', '.15em') // Adjust the position
-        .attr('transform', 'rotate(-45)'); // Rotate the text by -45 degrees
+        .selectAll('text')
+        .style('text-anchor', 'end')
+        .attr('dx', '-.8em')
+        .attr('dy', '.15em')
+        .attr('transform', 'rotate(-45)');
 
       svg.append('g')
         .attr('class', 'y axis')
         .call(yAxis);
 
-      // Y-axis label
       svg.append('text')
         .attr('transform', 'rotate(-90)')
         .attr('y', 0 - margin.left)
@@ -214,30 +202,25 @@
         .style('text-anchor', 'middle')
         .text('Average Purchase Amount (USD)');
 
-      // Function to update the chart based on the selected data
       function updateChart(data) {
-        // Update scales
         xScale.domain(Object.keys(data));
         yScale.domain([0, d3.max(Object.values(data)) + 10]);
 
-        // Update axes
         svg.select('.x.axis')
           .transition()
           .call(xAxis)
-          .selectAll('text') // Select all the text elements for rotation
-          .style('text-anchor', 'end') // Set text anchor to the end (right)
-          .attr('dx', '-.8em') // Adjust the position
-          .attr('dy', '.15em') // Adjust the position
-          .attr('transform', 'rotate(-45)'); // Rotate the text by -45 degrees
+          .selectAll('text')
+          .style('text-anchor', 'end')
+          .attr('dx', '-.8em')
+          .attr('dy', '.15em')
+          .attr('transform', 'rotate(-45)');
 
         svg.select('.y.axis')
           .transition()
           .call(yAxis);
 
-        // Select all existing bars and remove them before appending new ones
         svg.selectAll('rect').remove();
 
-        // Create bars
         const bars = svg.selectAll('rect')
           .data(Object.keys(data))
           .enter()
@@ -246,18 +229,15 @@
           .attr('y', d => yScale(data[d]))
           .attr('width', xScale.rangeBand() / 2)
           .attr('height', d => chartHeight - yScale(data[d]))
-          .attr('fill', d => d.toLowerCase().includes('female') ? '#FFA3D2' : '#0583D2') // Change color of the bars
+          .attr('fill', d => d.toLowerCase().includes('female') ? '#FFA3D2' : '#0583D2')
           .on('mouseover', function (d) {
-            // Show tooltip on mouseover
             const tooltip = d3.select('#tooltip');
             const average = computeAverageByGender(dataset)[d];
             const genderCategoryAverage = computeAverageByGenderAndCategory(dataset);
             const topCategories = getTopCategoriesByGender(dataset)[d];
 
-            // Generate tooltip content
             let tooltipContent = `Gender: ${d}<br>Average Amount: $${average.toFixed(2)}<br>Top Categories: ${topCategories.join(', ')}<br>`;
 
-            // Add average purchase amount for each category
             const sortedCategories = Object.keys(genderCategoryAverage).filter(key => key.startsWith(d + '-')).sort((a, b) => genderCategoryAverage[b] - genderCategoryAverage[a]);
             for (const category of sortedCategories) {
               tooltipContent += `${category.split('-')[1]}: $${genderCategoryAverage[category].toFixed(2)}<br>`;
@@ -270,13 +250,11 @@
               .style('display', 'block');
           })
           .on('mouseout', function () {
-            // Hide tooltip on mouseout
             const tooltip = d3.select('#tooltip');
             tooltip.style('display', 'none');
           });
       }
 
-      // Toggle between charts
       window.toggleChart = function () {
         isChart1 = !isChart1;
 
@@ -287,7 +265,6 @@
         }
       };
 
-      // Initial chart
       updateChart(computeAverageByGender(dataset));
     });
   </script>
